@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+	<context:component-scan base-package="com.springbook.biz"></context:component-scan>
+	<!-- <bean id="tv" class="polymorphism.SamsungTV" init-method="initMethod" 
+		destroy-method="destroyMethod" lazy-init="true"/> -->
+	<!-- 의존성 주입하는법 1.constructor-arg 및 property를 사용하는법, 2.p 네임스페이스 사용하기 -->
+	<!-- <bean id="tv" class="polymorphism.SamsungTV" p:speaker-ref="sony"
+		p:price="2700000">
+		<constructor-arg ref="sony"></constructor-arg> <constructor-arg value="2700000"></constructor-arg>
+		<property name="speaker" ref="apple"></property> <property name="price" 
+			value="2700000"></property>
+	</bean> -->
+	<!-- <bean id="sony" class="polymorphism.SonySpeaker" />
+	<bean id="apple" class="polymorphism.AppleSpeaker" /> -->
+	<!-- <bean id="lg" class="polymorphism.LgTV"/> -->
+	<!-- <bean id="collectionBean" class="com.springbook.ioc.injection.CollectionBean">
+		<property name="addressList">
+			<list>
+				<value>서울시 강남구 역삼동</value>
+				<value>서울시 성동구 행당동</value>
+			</list>
+			
+			<set value-type="java.lang.String">
+			<value>서울시 강남구 역삼동</value>
+			<value>서울시 강남구 성수동</value>
+			<value>서울시 성동구 성수동</value>
+			</set> 
+			
+			<map>
+			<entry>
+			<key><value>고길동</value></key>
+			<value>서울시 강남구 역삼동</value>
+			</entry>
+			<entry>
+			<key><value>마이콜</value></key>
+			<value>서울시 강서구 화곡동</value>
+			</entry>
+			</map>
+		</property>
+
+	</bean> -->
+<!-- <bean class="polymorphism.AppleSpeaker"></bean>
+<bean id="userDAO" class="com.springbook.biz.user.impl.UserDAO"/>
+<bean id="userService" class="com.springbook.biz.user.impl.UserServiceImpl">
+	<property name="userDAO" ref="userDAO"></property>
+</bean>	 -->
+<!-- DataSource 설정 -->
+<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	<property name="driverClassName" value="org.h2.Driver" />
+	<property name="url" value="jdbc:h2:tcp://localhost/~/test"/>
+	<property name="username" value="scott"/>
+	<property name="password" value="tiger"/>
+</bean>
+<!-- Spring JDBC 설정 -->
+<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+<property name="dataSource" ref="dataSource"/>
+</bean>
+<!-- Transaction 설정 -->
+<bean id="txManager"
+	class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	<property name="dataSource" ref="dataSource"></property>
+</bean>
+
+<tx:advice id="txAdvice" transaction-manager="txManager">
+	<tx:attributes>
+		<tx:method name="get*" read-only="true"/>
+		<tx:method name="*"/>
+	</tx:attributes>
+</tx:advice>
+
+<aop:config>
+	<aop:pointcut id="txPointcut" expression="execution(* com.springbook.biz..*(..))"/>
+	<aop:advisor pointcut-ref="txPointcut" advice-ref="txAdvice"/>
+</aop:config>
+</beans>
